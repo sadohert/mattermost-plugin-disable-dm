@@ -82,11 +82,15 @@ Team names are the URL-friendly identifiers, not the display names:
 ## How It Works
 
 1. The plugin intercepts all messages before they're posted using the `MessageWillBePosted` hook
-2. For DMs and group chats (when blocking is enabled):
-   - If team whitelist is disabled: All messages are blocked
-   - If team whitelist is enabled: Only users NOT in whitelisted teams are blocked
-3. Blocked users see an ephemeral message (visible only to them) with the rejection reason
-4. The message is not saved or visible to other users
+2. **For Direct Messages (when blocking is enabled):**
+   - If team whitelist is disabled: All DMs are blocked
+   - If team whitelist is enabled: Only users in whitelisted teams can send DMs
+3. **For Group Chats (when blocking is enabled):**
+   - If team whitelist is disabled: All group messages are blocked
+   - If team whitelist is enabled: Messages are only allowed if ALL members of the group are in whitelisted teams
+   - This prevents mixed staff-inmate group chats
+4. Blocked users see an ephemeral message (visible only to them) with the rejection reason
+5. The message is not saved or visible to other users
 
 ## Important Things to Know
 

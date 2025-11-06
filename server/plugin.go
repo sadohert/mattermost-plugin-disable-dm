@@ -70,16 +70,12 @@ func (p *Plugin) MessageWillBePosted(c *plugin.Context, post *model.Post) (*mode
 		return post, ""
 	}
 
-	// Check if this is a DM or group chat that should be blocked
-	shouldReject := (channel.Type == model.ChannelTypeDirect && conf.RejectDMs) ||
-		(channel.Type == model.ChannelTypeGroup && conf.RejectGroupChats)
-
-	if shouldReject {
-		// Check if user is in the whitelist (if whitelist is enabled)
+	// Check if this is a DM that should be blocked
+	if channel.Type == model.ChannelTypeDirect && conf.RejectDMs {
+		// For DMs, check if sender is whitelisted
 		isWhitelisted := conf.IsUserInWhitelistedTeam(post.UserId)
-
 		if !isWhitelisted {
-			config.Mattermost.LogInfo("Blocked DM/group message",
+			config.Mattermost.LogInfo("Blocked DM",
 				"user_id", post.UserId,
 				"channel_type", string(channel.Type))
 
@@ -88,6 +84,32 @@ func (p *Plugin) MessageWillBePosted(c *plugin.Context, post *model.Post) (*mode
 				ChannelId: post.ChannelId,
 			})
 			return nil, conf.RejectionMessage
+		}
+	}
+
+	// Check if this is a group chat that should be blocked
+	if channel.Type == model.ChannelTypeGroup && conf.RejectGroupChats {
+		// For group chats, check if ALL members are whitelisted
+		members, appErr := config.Mattermost.GetChannelMembers(post.ChannelId, 0, 100)
+		if appErr != nil {
+			config.Mattermost.LogError("Failed to get channel members", "channel_id", post.ChannelId, "error", appErr.Error())
+			return post, ""
+		}
+
+		// Check if all members (including sender) are whitelisted
+		for _, member := range members {
+			if !conf.IsUserInWhitelistedTeam(member.UserId) {
+				config.Mattermost.LogInfo("Blocked group message - not all members whitelisted",
+					"sender_id", post.UserId,
+					"non_whitelisted_user", member.UserId,
+					"channel_type", string(channel.Type))
+
+				config.Mattermost.SendEphemeralPost(post.UserId, &model.Post{
+					Message:   conf.RejectionMessage,
+					ChannelId: post.ChannelId,
+				})
+				return nil, conf.RejectionMessage
+			}
 		}
 	}
 
