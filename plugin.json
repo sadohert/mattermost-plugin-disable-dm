@@ -1,36 +1,57 @@
 {
   "id": "disable-dm",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "name": "Disable DM",
-  "description": "A Mattermost plugin to disable direct messages and group chats.",
+  "description": "A Mattermost plugin to disable direct messages and group chats with team-based whitelist support.",
+  "min_server_version": "9.0.0",
   "server": {
-    "executable": "server/plugin.exe"
-  },
-    "settings_schema": {
-        "settings": [
-            {
-                "key": "RejectDMs",
-                "display_name": "Reject DMs:",
-                "type": "bool",
-                "default": true,
-                "help_text": "If set the plugin will reject direct messages."
-            },
-            {
-                "key": "RejectGroupChats",
-                "display_name": "Reject Group Chats:",
-                "type": "bool",
-                "default": true,
-                "help_text": "If set the plugin will reject messages sent to group chats."
-            },
-            {
-                "key": "RejectionMessage",
-                "display_name": "Rejection Message:",
-                "type": "text",
-                "help_text": "Enter the message to display to users who try to send a direct message.",
-                "default": "Direct messages have been disabled by an administrator."
-            }
-        ],
-        "header": "",
-        "footer": ""
+    "executables": {
+      "linux-amd64": "server/dist/plugin-linux-amd64",
+      "linux-arm64": "server/dist/plugin-linux-arm64",
+      "darwin-amd64": "server/dist/plugin-darwin-amd64",
+      "darwin-arm64": "server/dist/plugin-darwin-arm64",
+      "windows-amd64": "server/dist/plugin-windows-amd64.exe"
     }
+  },
+  "settings_schema": {
+    "header": "Configure direct message and group chat restrictions. Use team whitelist to allow specific teams to bypass restrictions.",
+    "footer": "Note: Users must be members of at least one whitelisted team to send DMs/group messages when whitelist is enabled.",
+    "settings": [
+      {
+        "key": "RejectDMs",
+        "display_name": "Reject DMs",
+        "type": "bool",
+        "default": true,
+        "help_text": "If enabled, the plugin will reject direct messages (subject to whitelist rules)."
+      },
+      {
+        "key": "RejectGroupChats",
+        "display_name": "Reject Group Chats",
+        "type": "bool",
+        "default": true,
+        "help_text": "If enabled, the plugin will reject messages sent to group chats (subject to whitelist rules)."
+      },
+      {
+        "key": "RejectionMessage",
+        "display_name": "Rejection Message",
+        "type": "text",
+        "help_text": "The message displayed to users when their direct message or group chat is blocked.",
+        "default": "Direct messages have been disabled by an administrator."
+      },
+      {
+        "key": "EnableTeamWhitelist",
+        "display_name": "Enable Team Whitelist",
+        "type": "bool",
+        "default": false,
+        "help_text": "If enabled, only users who are members of the whitelisted teams can send DMs and group messages. All others will be blocked."
+      },
+      {
+        "key": "WhitelistedTeams",
+        "display_name": "Whitelisted Team Names",
+        "type": "text",
+        "help_text": "Comma-separated list of team names (not display names) that are allowed to send DMs and group messages. Example: staff-team,admin-team",
+        "default": ""
+      }
+    ]
+  }
 }
