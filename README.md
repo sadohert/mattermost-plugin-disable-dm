@@ -12,9 +12,10 @@ A Mattermost plugin to disable direct messages and group chats with team-based w
 ## Use Cases
 
 This plugin is ideal for organizations that need to control direct messaging, such as:
-- **Correctional Facilities**: Block inmate-to-inmate DMs while allowing staff communication
-- **Educational Institutions**: Restrict student DMs while permitting teacher communication
-- **Enterprises**: Enforce communication policies by team membership
+- **Educational Institutions**: Restrict student DMs while permitting teacher/staff communication
+- **Healthcare Organizations**: Control patient-to-patient messaging while allowing staff communication
+- **Enterprises**: Enforce communication policies based on team membership and organizational roles
+
 
 ## Requirements
 
@@ -62,13 +63,13 @@ Navigate to **System Console > Plugins > Disable DM** to configure:
 
 #### Example Configuration
 
-For a prison system where staff should communicate freely:
+For an organization where only staff/administrators should have DM privileges:
 
 1. Set **Reject DMs**: `true`
 2. Set **Reject Group Chats**: `true`
 3. Set **Enable Team Whitelist**: `true`
 4. Set **Whitelisted Team Names**: `staff-team,admin-team`
-5. Set **Rejection Message**: `Direct messaging between inmates is not permitted. Please use designated channels.`
+5. Set **Rejection Message**: `Direct messaging has been restricted. Please use designated channels for communication.`
 
 **Result**: Only members of `staff-team` or `admin-team` can send DMs and group messages. All other users will be blocked.
 
@@ -88,7 +89,7 @@ Team names are the URL-friendly identifiers, not the display names:
 3. **For Group Chats (when blocking is enabled):**
    - If team whitelist is disabled: All group messages are blocked
    - If team whitelist is enabled: Messages are only allowed if ALL members of the group are in whitelisted teams
-   - This prevents mixed staff-inmate group chats
+   - This prevents mixed communication between whitelisted and non-whitelisted users
 4. Blocked users see an ephemeral message (visible only to them) with the rejection reason
 5. The message is not saved or visible to other users
 
